@@ -5,6 +5,12 @@ on:
     branches:
       - ENG-1187-test
   workflow_dispatch:
+    inputs:
+      konfig_yaml_dir:
+        description: 'Path to directory which contains konfig.yaml'
+        type: string
+        required: true
+        default: '.'
   workflow_call:
     inputs:
       konfig_yaml_dir:
