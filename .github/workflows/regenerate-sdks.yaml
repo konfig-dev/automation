@@ -1,0 +1,19 @@
+name: Regenerate SDKs
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      konfig_yaml_dir:
+        description: 'Path to directory which contains konfig.yaml'
+        type: string
+        required: true
+        default: '.'
+
+jobs:
+  echo-input:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Echo input
+        run: echo ${{ inputs.konfig_yaml_dir }}

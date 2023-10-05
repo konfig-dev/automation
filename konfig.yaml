@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=https://unpkg.com/konfig-lib@latest/konfig-yaml.schema.json
+
+outputDirectory: /tmp/humanloop-v4-sdks-out
+specRemotePath: https://api.humanloop.com/v4/openapi.json
+specInputPath: openapi.json
+specPath: openapi-fixed.json
+progressYamlPath: ../v4-alpha/.konfig/progress.yaml
+omitInfoDescription: true
+fixConfig:
+  modify:
+    $.info.x-konfig-ignore:
+      object-with-no-properties: true
+  update:
+    $.components.schemas.ModelConfigCompletionRequest:
+      required:
+        - model
+        - prompt_template
+    $.components.schemas.ModelConfigCompletionRequest.properties.prompt_template:
+      example: '{{question}}'
+    $.:
+      openapi: 3.0.2
+generators:
+  java:
+    disabled: true
+    version: 1.0.0
+    groupId: com.konfigthis
+    artifactId: humanloop-java-sdk
+    clientName: Humanloop
+    outputDirectory: java
+    git:
+      userId: humanloop
+      repoId: humanloop-sdks/tree/main/v4/java
+  python:
+    version: 0.5.16
+    outputDirectory: python
+    clientName: Humanloop
+    setSkipSerializationToTrueByDefault: true
+    readmeSnippet: ../v4-alpha/snippets/pythonReadmeGettingStartedSnippet.py
+    readmeSupportingDescriptionSnippet: ../v4-alpha/snippets/pythonReadmeSupportingDescriptionSnippet.md
+    omitModelDocumentation: true
+    asyncReadmeSnippet: ../v4-alpha/snippets/pythonAsyncReadmeGettingStartedSnippet.py
+    copyFiles:
+      - konfigIgnore: ../v4-alpha/python/.konfigignore
+    clientState:
+      - openai_api_key
+      - openai_azure_api_key
+      - openai_azure_endpoint_api_key
+      - ai21_api_key
+      - mock_api_key
+      - anthropic_api_key
+      - cohere_api_key
+    clientStateIsOptional: true
+    topLevelOperations:
+      - operationId: Chats_create
+        methodName: chat
+      - operationId: Chats_createDeployed
+        methodName: chat_deployed
+      - operationId: Chats_createExperiment
+        methodName: chat_experiment
+      - operationId: Chats_createModelConfig
+        methodName: chat_model_configuration
+      - operationId: Completions_create
+        methodName: complete
+      - operationId: Completions_createDeployed
+        methodName: complete_deployed
+      - operationId: Completions_createExperiment
+        methodName: complete_experiment
+      - operationId: Completions_createModelConfig
+        methodName: complete_model_configuration
+      - operationId: Feedback_feedback
+        methodName: feedback
+      - operationId: Logs_log
+        methodName: log
+    git:
+      userId: humanloop
+      repoId: humanloop-python
+    packageName: humanloop
+    projectName: humanloop
+    useDescriptionInOperationTableDocumentation: true
+  typescript:
+    version: 0.5.16
+    clientName: Humanloop
+    npmName: humanloop
+    outputDirectory: typescript
+    readmeDescriptionSnippet: ../v4-alpha/snippets/typescriptReadmeDescriptionSnippet.md
+    readmeSnippet: ../v4-alpha/snippets/typescriptReadmeGettingStartedSnippet.ts
+    dependencies:
+      openai: ^4.10.0
+    useDescriptionInOperationTableDocumentation: true
+    copyFiles:
+      - konfigIgnore: ../v4-alpha/typescript/.konfigignore
+    git:
+      userId: humanloop
+      repoId: humanloop-node
+    removeRequiredProperties:
+      - provider_api_keys
+    includeFetchAdapter: true
+    includeEventSourceParser: true
+    clientState:
+      - openaiApiKey
+      - openaiAzureApiKey
+      - openaiAzureEndpointApiKey
+      - cohereApiKey
+      - ai21ApiKey
+      - mockApiKey
+      - anthropicApiKey
+    topLevelOperations:
+      - operationId: Chats_create
+        methodName: chat
+      - operationId: Chats_createDeployed
+        methodName: chatDeployed
+      - operationId: Chats_createExperiment
+        methodName: chatExperiment
+      - operationId: Chats_createModelConfig
+        methodName: chatModelConfiguration
+      - operationId: Completions_create
+        methodName: complete
+      - operationId: Completions_createDeployed
+        methodName: completeDeployed
+      - operationId: Completions_createExperiment
+        methodName: completeExperiment
+      - operationId: Completions_createModelConfig
+        methodName: completeModelConfiguration
+      - operationId: Feedback_feedback
+        methodName: feedback
+      - operationId: Logs_log
+        methodName: log
+    pagination:
+      parameters:
+        - page
+        - size
+      response:
+        - page
+        - size
+        - total

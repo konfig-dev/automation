@@ -1,0 +1,23 @@
+name: 'Get Branch Name'
+description: 'Get a branch name deterministically from konfig.yaml directory for SDK version bump PR.'
+inputs:
+  konfig_yaml_dir:
+    description: 'Directory of konfig.yaml file'
+    required: true
+outputs:
+  branch_name:
+    description: 'Branch name created from konfig.yaml directory'
+    value: ${{ steps.get-branch-name.outputs.branch_name }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get branch name
+      id: get-branch-name
+      run: |
+          echo "branch_name=$(echo bump-${{ inputs.konfig_yaml_dir }} |
+          sed 's/[^a-zA-Z0-9]/-/g' | # replace all non-alphanumeric characters with -
+          sed 's/--*/-/g' | # replace all multiple - with single -
+          sed 's/^-//g' | # remove leading -
+          sed 's/-$//g' | # remove trailing -
+          cut -c1-255)" >> $GITHUB_OUTPUT # cut to 255 characters
+      shell: bash

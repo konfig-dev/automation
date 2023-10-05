@@ -1,0 +1,22 @@
+name: 'Find konfig.yaml files'
+description: 'Finds all konfig.yaml files from the current directory.'
+outputs:
+  konfig_yaml_dirs:
+    description: 'The relative path to the parent directory of each konfig.yaml file,
+      as a string in json array format - ["dir1", "dir2"]'
+    value: ${{ steps.find-konfig-yamls.outputs.konfig_yaml_dirs }}
+runs:
+  using: "composite"
+  steps:
+    - name: Find konfig.yaml files
+      id: find-konfig-yamls
+      run: |
+        paths=$(find . -name "konfig.yaml")
+        konfig_yaml_dirs="["
+        for path in $paths; do
+          dir=$(dirname $path)
+          konfig_yaml_dirs="$konfig_yaml_dirs\"$dir\", "
+        done
+        konfig_yaml_dirs="${konfig_yaml_dirs::-2}]"
+        echo "konfig_yaml_dirs=$konfig_yaml_dirs" >> $GITHUB_OUTPUT
+      shell: bash
