@@ -43,6 +43,8 @@ jobs:
     - name: Regenerate SDKs
       run: konfig generate
       working-directory: ${{ inputs.konfig_yaml_dir }}
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Create changeset file
       run: konfig changeset -a -m "Regenerate SDKs"
