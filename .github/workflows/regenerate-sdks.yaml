@@ -1,6 +1,9 @@
 name: Regenerate SDKs
 
 on:
+  push:
+    branches:
+      - ENG-1187-test
   workflow_dispatch:
   workflow_call:
     inputs:
