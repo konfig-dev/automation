@@ -1,14 +1,7 @@
 name: Regenerate SDKs on OAS change
 
 on:
-  workflow_call:
-    inputs:
-      env:
-        description: 'Environment variables required to run tests.
-          Formatted as space-deliniated key-value pairs, e.g. "ENV_VAR1=123 ENV_VAR2=456"'
-        type: string
-        required: true
-        default: ''
+  workflow_call
 
 jobs:
   find-konfig-yamls:
@@ -80,4 +73,3 @@ jobs:
     uses: ./.github/workflows/regenerate-sdks.yaml
     with:
       konfig_yaml_dir: ${{ needs.check-if-oas-modified.outputs.directory }}
-      env: ${{ inputs.env }}

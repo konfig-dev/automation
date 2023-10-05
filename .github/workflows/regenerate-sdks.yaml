@@ -8,12 +8,6 @@ on:
         type: string
         required: true
         default: '.'
-      env:
-        description: 'Environment variables required to run tests.
-          Formatted as space-deliniated key-value pairs, e.g. "ENV_VAR1=123 ENV_VAR2=456"'
-        type: string
-        required: true
-        default: ''
 
 jobs:
   # Fixes and lints OAS. If linter passes, regenerates SDKs, creates changeset, and pushes
@@ -119,7 +113,7 @@ jobs:
 
     - name: Set env vars for test
       run: |
-        for var in ${{ inputs.env }}; do
+        for var in ${{ secrets.TEST_ENV }}; do
           echo $var >> $GITHUB_ENV
         done
 
