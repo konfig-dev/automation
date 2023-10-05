@@ -15,7 +15,7 @@ jobs:
 
       - name: Find konfig.yaml files
         id: find-konfig-yamls
-        uses: ./.github/actions/find-konfig-yamls
+        uses: konfig-dev/automation/.github/actions/find-konfig-yamls@ENG-1187-test
 
   check-if-oas-modified:
     runs-on: ubuntu-latest
