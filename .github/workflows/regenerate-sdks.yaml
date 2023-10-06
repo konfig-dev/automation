@@ -123,7 +123,7 @@ jobs:
 
     - name: Set env vars for test
       run: |
-        for var in ${{ secrets.TEST_ENV }}; do
+        for var in $(echo -n ${{ secrets.TEST_ENV }} | tr '\n' ' '); do
           echo $var >> $GITHUB_ENV
         done
 
