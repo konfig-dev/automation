@@ -120,6 +120,14 @@ jobs:
 
     - name: debug
       run: |
+        for var in "${{ secrets.TEST_ENV }}"; do
+          echo $var
+          echo "------"
+          echo ${var#*=}
+        done
+
+    - name: set
+      run: |
         echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
 
 
