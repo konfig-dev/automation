@@ -118,13 +118,13 @@ jobs:
     # - name: Install konfig
     #   run: npm install -g konfig-cli
 
-    - name: debug
+    - name: set mask
       run: |
         echo "${{ secrets.TEST_ENV }}" | while read -r line; do
-          echo ${line#*=}
+          echo "::add-mask::${line#*=}"
         done
 
-    - name: set
+    - name: set env
       run: |
         echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
 
