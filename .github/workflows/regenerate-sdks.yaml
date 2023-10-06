@@ -120,9 +120,9 @@ jobs:
 
     - name: debug
       run: |
-        while read -r line; do
+        for line in "${{ secrets.TEST_ENV }}"; do
           echo ${line#*=}
-        done <<< "${{ secrets.TEST_ENV }}"
+        done
 
     - name: set
       run: |
