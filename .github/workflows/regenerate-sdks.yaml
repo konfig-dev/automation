@@ -8,9 +8,6 @@ on:
         type: string
         required: true
         default: '.'
-    secrets:
-      TEST_ENV:
-        required: true
 
 jobs:
   # Fixes and lints OAS. If linter passes, regenerates SDKs, creates changeset, and pushes

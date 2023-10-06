@@ -77,4 +77,4 @@ jobs:
     with:
       konfig_yaml_dir: ${{ needs.check-if-oas-modified.outputs.directory }}
     secrets:
-      TEST_ENV: ${{ secrets.TEST_ENV }}
+      inherit: true
