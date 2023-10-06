@@ -122,7 +122,9 @@ jobs:
     #   run: npm install -g konfig-cli
 
     - name: debug
-      run: echo -e ${{ secrets.TEST_ENV }} >> $GITHUB_ENV
+      run: |
+        echo -e "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
+
 
     - name: print
       run: |
