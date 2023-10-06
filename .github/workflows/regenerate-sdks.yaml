@@ -118,9 +118,17 @@ jobs:
     - name: Install konfig
       run: npm install -g konfig-cli
 
+    - name: debug
+      run: |
+        echo ${{ vars.TEST_ENV }}
+        echo "------"
+        for var in ${{ vars.TEST_ENV }}; do
+          echo $var
+        done
+
     - name: Set env vars for test
       run: |
-        for var in ${{ secrets.TEST_ENV }}; do
+        for var in ${{ vars.TEST_ENV }}; do
           echo $var >> $GITHUB_ENV
         done
 
