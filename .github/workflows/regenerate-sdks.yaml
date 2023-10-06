@@ -123,7 +123,7 @@ jobs:
 
     - name: debug
       run: |
-        echo -e "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
+        echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
 
 
     - name: print
