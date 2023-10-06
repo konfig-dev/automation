@@ -122,13 +122,13 @@ jobs:
     #   run: npm install -g konfig-cli
 
     - name: debug
+      run: echo -e ${{ secrets.TEST_ENV }} >> $GITHUB_ENV
+
+    - name: print
       run: |
-        echo ${{ secrets.TEST_ENV }}
-        vars=$(echo -n ${{ secrets.TEST_ENV }} | tr '\n' ' ')
-        echo $vars
-        for var in $vars; do
-          echo $var
-        done
+        echo $AUTOMATION_TEST_API_KEY_1
+        echo "------"
+        echo $AUTOMATION_TEST_API_KEY_2
 
     # - name: Set env vars for test
     #   run: |
