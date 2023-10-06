@@ -120,16 +120,13 @@ jobs:
 
     - name: debug
       run: |
-        for var in "${{ secrets.TEST_ENV }}"; do
-          echo $var
-          echo "------"
-          echo ${var#*=}
-        done
+        while read -r line; do
+          echo ${line#*=}
+        done <<< "${{ secrets.TEST_ENV }}"
 
     - name: set
       run: |
         echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
-
 
     - name: print
       run: |
