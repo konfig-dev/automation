@@ -5,6 +5,8 @@ on:
     secrets:
       TEST_ENV:
         required: true
+      KONFIG_API_KEY:
+        required: true
 
 jobs:
   find-konfig-yamls:

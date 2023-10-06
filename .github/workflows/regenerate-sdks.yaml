@@ -128,12 +128,6 @@ jobs:
       run: |
         echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
 
-    - name: print check
-      run: |
-        echo $AUTOMATION_TEST_API_KEY_1
-        echo "------"
-        echo $AUTOMATION_TEST_API_KEY_2
-
     - name: Run tests
       run: konfig test
       working-directory: ${{ inputs.konfig_yaml_dir }}
