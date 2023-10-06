@@ -7,85 +7,73 @@ on:
         required: true
 
 jobs:
-  debug:
+  find-konfig-yamls:
     runs-on: ubuntu-latest
+    outputs:
+      konfig_yaml_dirs: ${{ steps.find-konfig-yamls.outputs.konfig_yaml_dirs }}
+
     steps:
-      - name: set env
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Find konfig.yaml files
+        id: find-konfig-yamls
+        uses: konfig-dev/automation/.github/actions/find-konfig-yamls@ENG-1187-test
+
+  check-if-oas-modified:
+    runs-on: ubuntu-latest
+    needs: find-konfig-yamls
+    strategy:
+      matrix:
+        konfig_yaml_dir: ${{ fromJson(needs.find-konfig-yamls.outputs.konfig_yaml_dirs) }}
+    outputs:
+      directory: ${{ steps.output.outputs.directory }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Read specPath from konfig.yaml
+        id: spec-path
+        uses: mikefarah/yq@v4.35.2
+        with:
+          cmd: yq '.specPath' ${{ matrix.konfig_yaml_dir }}/konfig.yaml
+
+      - name: Read specInputPath from konfig.yaml
+        id: spec-input-path
+        uses: mikefarah/yq@v4.35.2
+        with:
+          cmd: yq '.specInputPath' ${{ matrix.konfig_yaml_dir }}/konfig.yaml
+
+      # Use specInputPath if it exists. Otherwise, use specPath
+      - name: Determine final OAS input path
+        id: final-oas-path
         run: |
-          echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
+          if [ ${{ steps.spec-input-path.outputs.result }} = "null" ]; then
+            oas=${{ steps.spec-path.outputs.result }}
+          else
+            oas=${{ steps.spec-input-path.outputs.result }}
+          fi
+          echo "oas=${{ matrix.konfig_yaml_dir }}/$oas" >> $GITHUB_OUTPUT
 
-      - name: print
-        run: |
-          echo $AUTOMATION_TEST_API_KEY_1
-          echo "------"
-          echo $AUTOMATION_TEST_API_KEY_2
-  # find-konfig-yamls:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     konfig_yaml_dirs: ${{ steps.find-konfig-yamls.outputs.konfig_yaml_dirs }}
+      - name: Check if OAS was modified
+        id: check-oas-modified
+        uses: tj-actions/changed-files@v37.6.1
+        with:
+          files: ${{ steps.final-oas-path.outputs.oas }}
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+      # If OAS was modified, set job output to this konfig.yaml's directory
+      - name: Set output if OAS was modified
+        id: output
+        if : steps.check-oas-modified.outputs.any_changed == 'true'
+        run: echo "directory=${{ matrix.konfig_yaml_dir }}" >> $GITHUB_OUTPUT
 
-  #     - name: Find konfig.yaml files
-  #       id: find-konfig-yamls
-  #       uses: konfig-dev/automation/.github/actions/find-konfig-yamls@ENG-1187-test
-
-  # check-if-oas-modified:
-  #   runs-on: ubuntu-latest
-  #   needs: find-konfig-yamls
-  #   strategy:
-  #     matrix:
-  #       konfig_yaml_dir: ${{ fromJson(needs.find-konfig-yamls.outputs.konfig_yaml_dirs) }}
-  #   outputs:
-  #     directory: ${{ steps.output.outputs.directory }}
-
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-  #       with:
-  #         ref: ${{ github.head_ref }}
-
-  #     - name: Read specPath from konfig.yaml
-  #       id: spec-path
-  #       uses: mikefarah/yq@v4.35.2
-  #       with:
-  #         cmd: yq '.specPath' ${{ matrix.konfig_yaml_dir }}/konfig.yaml
-
-  #     - name: Read specInputPath from konfig.yaml
-  #       id: spec-input-path
-  #       uses: mikefarah/yq@v4.35.2
-  #       with:
-  #         cmd: yq '.specInputPath' ${{ matrix.konfig_yaml_dir }}/konfig.yaml
-
-  #     # Use specInputPath if it exists. Otherwise, use specPath
-  #     - name: Determine final OAS input path
-  #       id: final-oas-path
-  #       run: |
-  #         if [ ${{ steps.spec-input-path.outputs.result }} = "null" ]; then
-  #           oas=${{ steps.spec-path.outputs.result }}
-  #         else
-  #           oas=${{ steps.spec-input-path.outputs.result }}
-  #         fi
-  #         echo "oas=${{ matrix.konfig_yaml_dir }}/$oas" >> $GITHUB_OUTPUT
-
-  #     - name: Check if OAS was modified
-  #       id: check-oas-modified
-  #       uses: tj-actions/changed-files@v37.6.1
-  #       with:
-  #         files: ${{ steps.final-oas-path.outputs.oas }}
-
-  #     # If OAS was modified, set job output to this konfig.yaml's directory
-  #     - name: Set output if OAS was modified
-  #       id: output
-  #       if : steps.check-oas-modified.outputs.any_changed == 'true'
-  #       run: echo "directory=${{ matrix.konfig_yaml_dir }}" >> $GITHUB_OUTPUT
-
-  # regenerate-sdks:
-  #   needs: check-if-oas-modified
-  #   if: needs.check-if-oas-modified.outputs.directory != ''
-  #   uses: ./.github/workflows/regenerate-sdks.yaml
-  #   with:
-  #     konfig_yaml_dir: ${{ needs.check-if-oas-modified.outputs.directory }}
-  #   secrets: inherit
+  regenerate-sdks:
+    needs: check-if-oas-modified
+    if: needs.check-if-oas-modified.outputs.directory != ''
+    uses: ./.github/workflows/regenerate-sdks.yaml
+    with:
+      konfig_yaml_dir: ${{ needs.check-if-oas-modified.outputs.directory }}
+    secrets: inherit
