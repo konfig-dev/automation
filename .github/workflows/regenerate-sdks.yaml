@@ -123,8 +123,8 @@ jobs:
 
     - name: debug
       run: |
-        echo ${{ vars.TEST_ENV_TEST }}
-        vars=$(echo -n ${{ vars.TEST_ENV_TEST }} | tr '\n' ' ')
+        echo ${{ secrets.TEST_ENV }}
+        vars=$(echo -n ${{ secrets.TEST_ENV }} | tr '\n' ' ')
         echo $vars
         for var in $vars; do
           echo $var
