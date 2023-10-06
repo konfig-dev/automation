@@ -8,6 +8,9 @@ on:
         type: string
         required: true
         default: '.'
+    secrets:
+      TEST_SECRET:
+        required: true
 
 jobs:
   # Fixes and lints OAS. If linter passes, regenerates SDKs, creates changeset, and pushes
@@ -120,15 +123,11 @@ jobs:
 
     - name: debug
       run: |
-        echo ${{ vars.TEST_ENV }}
-        echo "------"
-        for var in ${{ vars.TEST_ENV }}; do
-          echo $var
-        done
+        echo ${{ secrets.TEST_SECRET }}
 
     - name: Set env vars for test
       run: |
-        for var in ${{ vars.TEST_ENV }}; do
+        for var in ${{ secrets.TEST_ENV }}; do
           echo $var >> $GITHUB_ENV
         done
 

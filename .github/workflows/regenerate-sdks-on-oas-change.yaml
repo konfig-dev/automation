@@ -1,7 +1,10 @@
 name: Regenerate SDKs on OAS change
 
 on:
-  workflow_call
+  workflow_call:
+    secrets:
+      TEST_SECRET:
+        required: true
 
 jobs:
   find-konfig-yamls:
@@ -73,3 +76,5 @@ jobs:
     uses: ./.github/workflows/regenerate-sdks.yaml
     with:
       konfig_yaml_dir: ${{ needs.check-if-oas-modified.outputs.directory }}
+    secrets:
+      TEST_SECRET: ${{ secrets.TEST_SECRET }}
