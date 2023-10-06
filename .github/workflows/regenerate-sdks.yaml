@@ -127,6 +127,8 @@ jobs:
     - name: Run tests
       run: konfig test
       working-directory: ${{ inputs.konfig_yaml_dir }}
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   # If tests pass, merge the PR.
   # If applicable, this will first merge the PRs in the SDK submodules
