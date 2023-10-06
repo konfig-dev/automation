@@ -76,5 +76,4 @@ jobs:
     uses: ./.github/workflows/regenerate-sdks.yaml
     with:
       konfig_yaml_dir: ${{ needs.check-if-oas-modified.outputs.directory }}
-    secrets:
-      inherit: true
+    secrets: inherit
