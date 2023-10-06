@@ -3,7 +3,7 @@ name: Regenerate SDKs on OAS change
 on:
   workflow_call:
     secrets:
-      TEST_SECRET:
+      TEST_ENV:
         required: true
 
 jobs:
@@ -77,4 +77,4 @@ jobs:
     with:
       konfig_yaml_dir: ${{ needs.check-if-oas-modified.outputs.directory }}
     secrets:
-      TEST_SECRET: ${{ secrets.TEST_SECRET }}
+      TEST_ENV: ${{ secrets.TEST_ENV }}

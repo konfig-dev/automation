@@ -9,7 +9,7 @@ on:
         required: true
         default: '.'
     secrets:
-      TEST_SECRET:
+      TEST_ENV:
         required: true
 
 jobs:
@@ -120,10 +120,6 @@ jobs:
 
     - name: Install konfig
       run: npm install -g konfig-cli
-
-    - name: debug
-      run: |
-        echo ${{ secrets.TEST_SECRET }}
 
     - name: Set env vars for test
       run: |
