@@ -7,6 +7,10 @@ on:
         required: true
       KONFIG_API_KEY:
         required: true
+      SUBMODULE_DEPLOY_KEY_TYPESCRIPT:
+        required: false
+      SUBMODULE_DEPLOY_KEY_PYTHON:
+        required: false
 
 jobs:
   find-konfig-yamls:
