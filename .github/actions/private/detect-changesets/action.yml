@@ -1,0 +1,22 @@
+name: 'Detect changeset files'
+description: 'Determines if any changeset files are present in .konfig/changesets'
+inputs:
+  konfig_yaml_dir:
+    description: 'Directory of konfig.yaml file'
+    required: true
+outputs:
+  has_changesets:
+    description: "'true' if there are changesets in .konfig/changesets. 'false' otherwise."
+    value: ${{ steps.detect-changesets.outputs.has_changesets }}
+runs:
+  using: "composite"
+  steps:
+    - name: Check for changesets
+      id: detect-changesets
+      run: |
+        if [ -n "$(find ${{ inputs.konfig_yaml_dir }}/.konfig/changesets -type f)" ]; then
+          echo "has_changesets=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_changesets=false" >> $GITHUB_OUTPUT
+        fi
+      shell: bash

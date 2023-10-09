@@ -1,0 +1,46 @@
+name: Sync SDK submodules
+description: 'Get most up-to-date SDK submodules and commit the result if applicable.'
+inputs:
+  konfig_yaml_dir:
+    description: 'Directory of konfig.yaml file'
+    required: true
+  sdk_submodule_dirs:
+    description: 'Space-deliniated list of SDK submodule directories relative to konfig_yaml_dir'
+    required: true
+  submodules_base_branch:
+    description: 'Name of branch to sync for submodule SDKs (e.g. main, master)'
+    required: true
+  push_to:
+    description: 'Name of branch to push sync to in top-level repo. If empty, submodule sync is committed but not pushed'
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Sync submodules
+      id: sync-submodules
+      working-directory: ${{ inputs.konfig_yaml_dir }}
+      shell: bash
+      run: |
+        git submodule foreach '
+          if [ -n "$(echo "${{ inputs.sdk_submodule_dirs }}" | grep "$displaypath ")" ]; then
+            git fetch origin ${{ inputs.submodules_base_branch }}
+            git checkout FETCH_HEAD
+          fi
+        '
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "sycned=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Commit submodule sync
+      if: ${{ steps.sync-submodules.outputs.sycned == 'true' }}
+      working-directory: ${{ inputs.konfig_yaml_dir }}
+      shell: bash
+      run: |
+        git add -A
+        git commit -m "Update submodule references"
+
+    - name: Push submodule sync
+      if: ${{ inputs.push_to != '' && steps.sync-submodules.outputs.sycned == 'true' }}
+      working-directory: ${{ inputs.konfig_yaml_dir }}
+      shell: bash
+      run: git push origin HEAD:refs/heads/${{ inputs.push_to }}

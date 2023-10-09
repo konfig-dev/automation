@@ -14,7 +14,7 @@ jobs:
   regenerate-sdks:
     runs-on: ubuntu-latest
     outputs:
-      sdk_submodule_dirs: ${{ steps.sdk-submodule-dirs.outputs.dirs }}
+      sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
 
     steps:
     - name: Checkout code
@@ -55,13 +55,14 @@ jobs:
         git config --global user.email "publisher@konfigthis.com"
         git config --global user.name "konfig-publisher"
 
-    - name: Get SDK submodule directories
-      id: sdk-submodule-dirs
-      run: echo "dirs=$(konfig list-sdk-submodules | tr '\n' ' ')" >> $GITHUB_OUTPUT
-      working-directory: ${{ inputs.konfig_yaml_dir }}
+    - name: Detect SDK submodules
+      id: sdk-submodules
+      uses: konfig-dev/automation/.github/actions/private/detect-sdk-submodules@main
+      with:
+        konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
 
     - name: Set up SSH key for submodule access
-      if: steps.sdk-submodule-dirs.outputs.dirs != ''
+      if: steps.sdk-submodules.outputs.dirs != ''
       uses: webfactory/ssh-agent@v0.8.0
       with:
         ssh-private-key: |
@@ -72,13 +73,13 @@ jobs:
     # For each submodule, if it is an SDK directory, then commit and push. Open a PR if one does not exist yet
     - name: Commit and push (submodules)
       working-directory: ${{ inputs.konfig_yaml_dir }}
-      if: steps.sdk-submodule-dirs.outputs.dirs != ''
+      if: steps.sdk-submodules.outputs.dirs != ''
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
       run: |
         git submodule foreach '
-          if [ -n "$(echo "${{ steps.sdk-submodule-dirs.outputs.dirs }}" | grep "$displaypath ")" ]; then
+          if [ -n "$(echo "${{ steps.sdk-submodules.outputs.dirs }}" | grep "$displaypath ")" ]; then
             git add -A
             git commit -m "Regenerate SDKs"
             git push origin HEAD:refs/heads/${{ github.head_ref }}
@@ -125,8 +126,7 @@ jobs:
         done
 
     - name: Set env vars for test
-      run: |
-        echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
+      run: echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
 
     - name: Run tests
       run: konfig test
@@ -173,17 +173,12 @@ jobs:
 
     - name: Update submodule references
       if: needs.regenerate-sdks.outputs.sdk_submodule_dirs != ''
-      working-directory: ${{ inputs.konfig_yaml_dir }}
-      run: |
-        git submodule foreach '
-          if [ -n "$(echo "${{ needs.regenerate-sdks.outputs.sdk_submodule_dirs }}" | grep "$displaypath ")" ]; then
-            git fetch origin ${{ github.base_ref }}
-            git checkout FETCH_HEAD
-          fi
-        '
-        git add -A
-        git commit -m "Update submodule references"
-        git push origin HEAD:${{ github.head_ref }}
+      uses: konfig-dev/automation/.github/actions/private/sync-submodules@main
+      with:
+        konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+        sdk_submodule_dirs: ${{ needs.regenerate-sdks.outputs.sdk_submodule_dirs }}
+        submodules_base_branch: ${{ github.base_ref }}
+        push_to: ${{ github.head_ref }}
 
     - name: Merge top-level PR
       env:
