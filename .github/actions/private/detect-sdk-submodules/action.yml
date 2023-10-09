@@ -1,0 +1,18 @@
+name: 'Detect SDKs which are git submodules'
+description: 'Determines which, if any, SDKs are git submodules. (Requires konfig-cli)'
+inputs:
+  konfig_yaml_dir:
+    description: 'Directory of konfig.yaml file'
+    required: true
+outputs:
+  dirs:
+    description: 'Space-deliniated list of directories of SDK submodules relative to konfig.yaml directory.'
+    value: ${{ steps.detect-submodules.outputs.dirs }}
+runs:
+  using: "composite"
+  steps:
+    - name: Detect SDK submodules
+      id: detect-submodules
+      run: echo "dirs=$(konfig list-sdk-submodules | tr '\n' ' ')" >> $GITHUB_OUTPUT
+      working-directory: ${{ inputs.konfig_yaml_dir }}
+      shell: bash
