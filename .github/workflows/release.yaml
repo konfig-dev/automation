@@ -19,6 +19,11 @@ jobs:
       konfig_yaml_dirs: ${{ steps.find-konfig-yamls.outputs.konfig_yaml_dirs }}
 
     steps:
+      - name: debug
+        run: echo hello
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Checkout code
         uses: actions/checkout@v3
 
