@@ -88,7 +88,6 @@ jobs:
           submodules_base_branch: ${{ github.ref_name }}
           push_to: ${{ github.ref_name }}
 
-  # If there are no changeset files, test and publish if tests pass
   publish:
     runs-on: ubuntu-latest
     needs: pre-publish
@@ -96,9 +95,9 @@ jobs:
     container: # runs in docker container
       image: konfigdev/test-and-publish:latest
     env:
-      TWINE_USERNAME: ${{ vars.TWINE_USERNAME }}
-      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      PYPI_TOKEN_1: ${{ secrets.PYPI_TOKEN_1 }}
+      PYPI_TOKEN_2: ${{ secrets.PYPI_TOKEN_2 }}
 
     steps:
       - name: Checkout code

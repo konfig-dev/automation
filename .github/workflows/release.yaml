@@ -3,13 +3,19 @@ name: Release
 on:
   workflow_call:
     secrets:
-      TEST_ENV:
-        required: true
       KONFIG_API_KEY:
         required: true
+      TEST_ENV:
+        required: false
       SUBMODULE_DEPLOY_KEY_TYPESCRIPT:
         required: false
       SUBMODULE_DEPLOY_KEY_PYTHON:
+        required: false
+      NPM_TOKEN:
+        required: false
+      PYPI_TOKEN_1:
+        required: false
+      PYPI_TOKEN_2:
         required: false
 
 jobs:
