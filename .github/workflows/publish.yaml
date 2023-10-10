@@ -98,6 +98,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       PYPI_TOKEN_1: ${{ secrets.PYPI_TOKEN_1 }}
       PYPI_TOKEN_2: ${{ secrets.PYPI_TOKEN_2 }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout code
