@@ -48,7 +48,9 @@ jobs:
           konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
 
       - name: Set git config
-        if: steps.detect-changesets.outputs.has_changesets == 'false'
+        if: >
+          steps.detect-changesets.outputs.has_changesets == 'false' &&
+          steps.sdk-submodules.outputs.dirs != ''
         run: |
           git config --global user.email "publisher@konfigthis.com"
           git config --global user.name "konfig-publisher"
