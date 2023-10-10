@@ -42,3 +42,6 @@ jobs:
       matrix:
         konfig_yaml_dir: ${{ fromJson(needs.find_konfig_yamls.outputs.konfig_yaml_dirs) }}
     uses: ./.github/workflows/publish.yaml
+    with:
+      konfig_yaml_dir: ${{ matrix.konfig_yaml_dir }}
+    secrets: inherit
