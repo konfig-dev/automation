@@ -129,6 +129,14 @@ jobs:
           repo=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           git config --global --add safe.directory /__w/$repo/$repo
 
+      # If any SDKs are in submodules, then publishing might require pushing tags to the submodule repos
+      - name: Set up SSH key for submodule access
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
+
       - name: Publish SDKs
         run: konfig publish --all --skipTests --tolerateRepublish --skipRemoteCheck
         working-directory: ${{ inputs.konfig_yaml_dir }}
