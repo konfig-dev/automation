@@ -70,6 +70,10 @@ jobs:
       with:
         konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
         sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
+        submodule_deploy_keys: |
+          ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
+          ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
+          ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
         head: ${{ github.head_ref }}
         base: ${{ github.base_ref }}
         commit_msg: "Regenerate SDKs"
@@ -101,6 +105,8 @@ jobs:
 
     - name: Setup test env vars
       uses: konfig-dev/automation/.github/actions/private/inject-testing-env-vars@ENG-1187-test-3
+      with:
+        TEST_ENV: ${{ secrets.TEST_ENV }}
 
     - name: Run tests
       run: konfig test

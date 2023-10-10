@@ -103,6 +103,8 @@ jobs:
 
       - name: Setup test env vars
         uses: konfig-dev/automation/.github/actions/private/inject-testing-env-vars@ENG-1187-test-3
+        with:
+          TEST_ENV: ${{ secrets.TEST_ENV }}
 
       - name: Run tests
         run: konfig test

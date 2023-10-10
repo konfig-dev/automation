@@ -7,6 +7,9 @@ inputs:
   sdk_submodule_dirs:
     description: 'Space-deliniated list of directories of SDK submodules relative to konfig.yaml directory.'
     required: true
+  submodule_deploy_keys:
+    description: 'Newline-deliniated list of submodule deploy keys.'
+    required: true
   head:
     description: 'Branch to push to and open PR from'
     required: true
@@ -33,10 +36,7 @@ runs:
     - name: Set up SSH key for submodule access
       uses: webfactory/ssh-agent@v0.8.0
       with:
-        ssh-private-key: |
-          ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
-          ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
-          ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
+        ssh-private-key: ${{ inputs.submodule_deploy_keys }}
 
     - name: Commit and push (submodules)
       shell: bash

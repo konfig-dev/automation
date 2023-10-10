@@ -81,6 +81,10 @@ jobs:
         with:
           konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
           sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
+          submodule_deploy_keys: |
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
           head: ${{ steps.branch-name.outputs.branch_name }}
           base: ${{ github.ref_name }}
           commit_msg: "Version Bump SDKs"
