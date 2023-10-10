@@ -19,9 +19,6 @@ jobs:
       konfig_yaml_dirs: ${{ steps.find-konfig-yamls.outputs.konfig_yaml_dirs }}
 
     steps:
-      - name: debug
-        run: echo ${{ toJson(secrets) }}
-
       - name: Checkout code
         uses: actions/checkout@v3
 
