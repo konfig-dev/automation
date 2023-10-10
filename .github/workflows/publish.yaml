@@ -1,0 +1,133 @@
+name: Publish
+
+on:
+  workflow_call:
+    inputs:
+      konfig_yaml_dir:
+        description: 'Path to directory which contains konfig.yaml'
+        type: string
+        required: true
+        default: '.'
+
+jobs:
+  # Updates submodule SHAs if necessary and prepares for publishing
+  pre-publish:
+    runs-on: ubuntu-latest
+    outputs:
+      has_changesets: ${{ steps.detect-changesets.outputs.has_changesets }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Detect changeset files
+        id: detect-changesets
+        uses: konfig-dev/automation/.github/actions/private/detect-changesets@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+
+      - name: Install konfig
+        if: steps.detect-changesets.outputs.has_changesets == 'false'
+        run: npm install -g konfig-cli
+
+      - name: Detect SDK submodules
+        if: steps.detect-changesets.outputs.has_changesets == 'false'
+        id: sdk-submodules
+        uses: konfig-dev/automation/.github/actions/private/detect-sdk-submodules@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+
+      - name: Get version bump branch name
+        id: branch-name
+        if: >
+          steps.detect-changesets.outputs.has_changesets == 'false' &&
+          steps.sdk-submodules.outputs.dirs != ''
+        uses: konfig-dev/automation/.github/actions/private/get-branch-name@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+
+      - name: Set git config
+        if: steps.detect-changesets.outputs.has_changesets == 'false'
+        run: |
+          git config --global user.email "publisher@konfigthis.com"
+          git config --global user.name "konfig-publisher"
+
+      - name: Merge submodule version bump PRs
+        if: >
+          steps.detect-changesets.outputs.has_changesets == 'false' &&
+          steps.sdk-submodules.outputs.dirs != ''
+        working-directory: ${{ inputs.konfig_yaml_dir }}
+        env:
+          KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
+        run: |
+          git submodule foreach '
+            if [ -n "$(echo "${{ steps.sdk-submodules.outputs.dirs }}" | grep "$displaypath ")" ]; then
+              echo Merging PR in SDK submodule at path: $name
+              # git remote url looks like this: https://github.com/owner/repo.git
+              owner=$(git remote get-url origin | cut -d '/' -f 4)
+              repo=$(git remote get-url origin | cut -d '/' -f 5 | sed 's/\.git.*//')
+              konfig pr-merge \
+                    --owner $owner \
+                    --repo $repo \
+                    --head ${{ steps.branch-name.outputs.branch_name }} \
+                    --base ${{ github.ref_name }}
+            fi
+          '
+
+      - name: Update submodule references
+        if: >
+          steps.detect-changesets.outputs.has_changesets == 'false' &&
+          steps.sdk-submodules.outputs.dirs != ''
+        uses: konfig-dev/automation/.github/actions/private/sync-submodules@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+          sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
+          submodules_base_branch: ${{ github.ref_name }}
+          push_to: ${{ github.ref_name }}
+
+  # If there are no changeset files, test and publish if tests pass
+  publish:
+    runs-on: ubuntu-latest
+    needs: pre-publish
+    if: needs.pre-publish.outputs.has_changesets == 'false'
+    container: # runs in docker container
+      image: konfigdev/test-and-publish:latest
+    env:
+      TWINE_USERNAME:  ${{ vars.TWINE_USERNAME }}
+      TWINE_PASSWORD:  ${{ secrets.TWINE_PASSWORD }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          submodules: true
+
+      - name: Install konfig
+        run: npm install -g konfig-cli
+
+      - name: Mask secrets
+        run: |
+          echo "${{ secrets.TEST_ENV }}" | while read -r line; do
+            echo "::add-mask::${line#*=}"
+          done
+
+      - name: Set env vars for test
+        run: echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: konfig test
+        working-directory: ${{ inputs.konfig_yaml_dir }}
+
+      - name: Set git config
+        run: |
+          git config --global user.email "publisher@konfigthis.com"
+          git config --global user.name "konfig-publisher"
+          git config --global --add safe.directory /__w/humanloop-sdks/humanloop-sdks
+
+      - name: Publish SDKs
+        run: konfig publish --all --skipTests --tolerateRepublish
+        working-directory: ${{ inputs.konfig_yaml_dir }}
+        shell: bash

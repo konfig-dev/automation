@@ -1,0 +1,133 @@
+name: Bump
+
+on:
+  workflow_call:
+    inputs:
+      konfig_yaml_dir:
+        description: 'Path to directory which contains konfig.yaml'
+        type: string
+        required: true
+        default: '.'
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Detect changeset files
+        id: detect-changesets
+        uses: konfig-dev/automation/.github/actions/private/detect-changesets@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+
+      - name: Install konfig
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
+        run: npm install -g konfig-cli
+
+      - name: Detect SDK submodules
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
+        id: sdk-submodules
+        uses: konfig-dev/automation/.github/actions/private/detect-sdk-submodules@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+
+      - name: Set git config
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
+        run: |
+          git config --global user.email "publisher@konfigthis.com"
+          git config --global user.name "konfig-publisher"
+
+      - name: Update submodule references
+        if: >
+          steps.detect-changesets.outputs.has_changesets == 'true' &&
+          steps.sdk-submodules.outputs.dirs != ''
+        uses: konfig-dev/automation/.github/actions/private/sync-submodules@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+          sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
+          submodules_base_branch: ${{ github.ref_name }}
+
+      - name: Get version bump branch name
+        id: branch-name
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
+        uses: konfig-dev/automation/.github/actions/private/get-branch-name@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+
+      - name: Bump SDK versions
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
+        run: konfig version
+        working-directory: ${{ inputs.konfig_yaml_dir }}
+
+      - name: Regenerate SDKs
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
+        run: konfig generate
+        working-directory: ${{ inputs.konfig_yaml_dir }}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Set up SSH key for submodule access
+        if: >
+          steps.detect-changesets.outputs.has_changesets == 'true' &&
+          steps.sdk-submodules.outputs.dirs != ''
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
+
+      # For each submodule, if it is an SDK directory, then commit and push. Open a PR if one does not exist yet
+      - name: Commit and push (submodules)
+        working-directory: ${{ inputs.konfig_yaml_dir }}
+        if: >
+          steps.detect-changesets.outputs.has_changesets == 'true' &&
+          steps.sdk-submodules.outputs.dirs != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
+        run: |
+          git submodule foreach '
+            if [ -n "$(echo "${{ steps.sdk-submodules.outputs.dirs }}" | grep "$displaypath ")" ]; then
+              echo Creating or updating version bump pr for SDK submodule at path: $name
+              git add -A
+              git commit -m "Version Bump SDKs"
+              # force push because we only want to bump version once per PR
+              git push origin HEAD:refs/heads/${{ steps.branch-name.outputs.branch_name }} --force
+              # git remote url looks like this: git@key-abcd.github.com:owner/repo.git
+              owner=$(git remote get-url origin | cut -d '/' -f 1 | cut -d ':' -f 2)
+              repo=$(git remote get-url origin | cut -d '/' -f 2 | sed 's/\.git.*//')
+              konfig pr-create \
+                --head ${{ steps.branch-name.outputs.branch_name }} \
+                --base ${{ github.ref_name }} \
+                --owner $owner \
+                --repo $repo \
+                --title "Version Bump SDKs" \
+                --body "Version Bumps SDKs" # TODO: this should be replaced by a changelog
+            fi
+          '
+
+      # Capturing the verison bump PR submodule SHAs in the top-level PR does not matter
+      # because merging the submodule's version bump PRs creates a different SHA anyways
+      # They will be updated by the publishing process once the top-level version bump PR is merged
+      - name: Commit and push (top-level repo)
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
+        working-directory: ${{ inputs.konfig_yaml_dir }}
+        env:
+          KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
+        run: |
+          git add -A
+          git commit -m "Version Bump SDKs"
+          # force push because we only want to bump version once per PR
+          git push origin HEAD:refs/heads/${{ steps.branch-name.outputs.branch_name }} --force
+          repo=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          konfig pr-create \
+                --head ${{ steps.branch-name.outputs.branch_name }} \
+                --base ${{ github.ref_name }} \
+                --owner ${{ github.repository_owner }} \
+                --repo $repo \
+                --title "Version Bump SDKs" \
+                --body "Version Bumps SDKs" # TODO: this should be replaced by a changelog

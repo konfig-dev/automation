@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  workflow_call:
+    secrets:
+      TEST_ENV:
+        required: true
+      KONFIG_API_KEY:
+        required: true
+      SUBMODULE_DEPLOY_KEY_TYPESCRIPT:
+        required: false
+      SUBMODULE_DEPLOY_KEY_PYTHON:
+        required: false
+
+jobs:
+  find-konfig-yamls:
+    runs-on: ubuntu-latest
+    outputs:
+      konfig_yaml_dirs: ${{ steps.find-konfig-yamls.outputs.konfig_yaml_dirs }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Find konfig.yaml files
+        id: find-konfig-yamls
+        uses: konfig-dev/automation/.github/actions/find-konfig-yamls@main
+
+  bump:
+    needs: find-konfig-yamls
+    strategy:
+      matrix:
+        konfig_yaml_dir: ${{ fromJson(needs.find-konfig-yamls.outputs.konfig_yaml_dirs) }}
+    uses: ./.github/workflows/bump.yaml
+    with:
+      konfig_yaml_dir: ${{ matrix.konfig_yaml_dir }}
+    secrets: inherit
+
+  publish:
+    needs: find-konfig-yamls
+    strategy:
+      matrix:
+        konfig_yaml_dir: ${{ fromJson(needs.find_konfig_yamls.outputs.konfig_yaml_dirs) }}
+    uses: ./.github/workflows/publish.yaml
