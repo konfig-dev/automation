@@ -125,7 +125,8 @@ jobs:
         run: |
           git config --global user.email "publisher@konfigthis.com"
           git config --global user.name "konfig-publisher"
-          git config --global --add safe.directory /__w/humanloop-sdks/humanloop-sdks
+          repo=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          git config --global --add safe.directory /__w/$repo/$repo
 
       - name: Publish SDKs
         run: konfig publish --all --skipTests --tolerateRepublish
