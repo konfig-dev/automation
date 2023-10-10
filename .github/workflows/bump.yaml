@@ -11,6 +11,7 @@ on:
 
 jobs:
   bump:
+    name: bump | ${{ inputs.konfig_yaml_dir }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

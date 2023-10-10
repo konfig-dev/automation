@@ -12,6 +12,7 @@ on:
 jobs:
   # Updates submodule SHAs if necessary and prepares for publishing
   pre-publish:
+    name: pre-publish | ${{ inputs.konfig_yaml_dir }}
     runs-on: ubuntu-latest
     outputs:
       has_changesets: ${{ steps.detect-changesets.outputs.has_changesets }}
@@ -88,6 +89,7 @@ jobs:
 
   # If there are no changeset files, test and publish if tests pass
   publish:
+    name: publish | ${{ inputs.konfig_yaml_dir }}
     runs-on: ubuntu-latest
     needs: pre-publish
     if: needs.pre-publish.outputs.has_changesets == 'false'
