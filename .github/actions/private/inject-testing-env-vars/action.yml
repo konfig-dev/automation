@@ -1,0 +1,15 @@
+name: 'Inject Environment Variables for konfig test'
+description: 'Injects vars from TEST_ENV secret into GITHUB_ENV and masks their values'
+runs:
+  using: "composite"
+  steps:
+    - name: Mask secrets
+      shell: bash
+      run: |
+        echo "${{ secrets.TEST_ENV }}" | while read -r line; do
+          echo "::add-mask::${line#*=}"
+        done
+
+    - name: Set env vars for test
+      shell: bash
+      run: echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV

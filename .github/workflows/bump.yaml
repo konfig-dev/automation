@@ -70,45 +70,23 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Set up SSH key for submodule access
-        if: >
-          steps.detect-changesets.outputs.has_changesets == 'true' &&
-          steps.sdk-submodules.outputs.dirs != ''
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: |
-            ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
-            ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
-
-      # For each submodule, if it is an SDK directory, then commit and push. Open a PR if one does not exist yet
-      - name: Commit and push (submodules)
-        working-directory: ${{ inputs.konfig_yaml_dir }}
+      - name: Push SDK submodules to PR
         if: >
           steps.detect-changesets.outputs.has_changesets == 'true' &&
           steps.sdk-submodules.outputs.dirs != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
-        run: |
-          git submodule foreach '
-            if [ -n "$(echo "${{ steps.sdk-submodules.outputs.dirs }}" | grep "$displaypath ")" ]; then
-              echo Creating or updating version bump pr for SDK submodule at path: $name
-              git add -A
-              git commit -m "Version Bump SDKs"
-              # force push because we only want to bump version once per PR
-              git push origin HEAD:refs/heads/${{ steps.branch-name.outputs.branch_name }} --force
-              # git remote url looks like this: git@key-abcd.github.com:owner/repo.git
-              owner=$(git remote get-url origin | cut -d '/' -f 1 | cut -d ':' -f 2)
-              repo=$(git remote get-url origin | cut -d '/' -f 2 | sed 's/\.git.*//')
-              konfig pr-create \
-                --head ${{ steps.branch-name.outputs.branch_name }} \
-                --base ${{ github.ref_name }} \
-                --owner $owner \
-                --repo $repo \
-                --title "Version Bump SDKs" \
-                --body "Version Bumps SDKs" # TODO: this should be replaced by a changelog
-            fi
-          '
+        uses: konfig-dev/automation/.github/actions/private/push-submodules-to-pr@ENG-1187-test-3
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+          sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
+          head: ${{ steps.branch-name.outputs.branch_name }}
+          base: ${{ github.ref_name }}
+          commit_msg: "Version Bump SDKs"
+          pr_title: "Version Bump SDKs"
+          pr_body: "Do not manually merge this PR. It will be merged automatically once the top-level PR is merged."
+          force: "true" # force push because we only want to bump version once per PR
 
       # Capturing the verison bump PR submodule SHAs in the top-level PR does not matter
       # because merging the submodule's version bump PRs creates a different SHA anyways

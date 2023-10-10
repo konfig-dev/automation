@@ -1,0 +1,68 @@
+name: 'Push Submodules to PR'
+description: 'Commit, push, and open a PR for SDK submodules.'
+inputs:
+  konfig_yaml_dir:
+    description: 'Directory of konfig.yaml file'
+    required: true
+  sdk_submodule_dirs:
+    description: 'Space-deliniated list of directories of SDK submodules relative to konfig.yaml directory.'
+    required: true
+  head:
+    description: 'Branch to push to and open PR from'
+    required: true
+  base:
+    description: 'Branch to open PR against'
+    required: true
+  commit_msg:
+    description: 'Commit message'
+    required: true
+  pr_title:
+    description: 'PR title'
+    required: true
+  pr_body:
+    description: 'PR body'
+    required: false
+    default: ""
+  force:
+    description: 'Force push to branch'
+    required: false
+    default: "false"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up SSH key for submodule access
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
+          ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
+          ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
+
+    - name: Commit and push (submodules)
+      shell: bash
+      working-directory: ${{ inputs.konfig_yaml_dir }}
+      run: |
+        git submodule foreach '
+          if [ -n "$(echo "${{ inputs.sdk_submodule_dirs }}" | grep "$displaypath ")" ]; then
+            git add -A
+            git commit -m "${{ inputs.commit_msg }}"
+
+            if [ "${{ inputs.force }}" == "true" ]; then
+              git push origin HEAD:refs/heads/${{ inputs.head }} --force
+            else
+              git push origin HEAD:refs/heads/${{ inputs.head }}
+            fi
+
+            # git remote url looks like this: git@key-abcd.github.com:owner/repo.git
+            owner=$(git remote get-url origin | cut -d '/' -f 1 | cut -d ':' -f 2)
+            repo=$(git remote get-url origin | cut -d '/' -f 2 | sed 's/\.git.*//')
+
+            konfig pr-create \
+              --head ${{ inputs.head }} \
+              --base ${{ inputs.base }} \
+              --owner $owner \
+              --repo $repo \
+              --title ${{ inputs.pr_title }} \
+              --body ${{ inputs.pr_body }}
+          fi
+        '
