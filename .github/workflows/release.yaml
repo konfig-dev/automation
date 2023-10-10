@@ -24,7 +24,7 @@ jobs:
 
       - name: Find konfig.yaml files
         id: find-konfig-yamls
-        uses: konfig-dev/automation/.github/actions/find-konfig-yamls@main
+        uses: konfig-dev/automation/.github/actions/private/find-konfig-yamls@main
 
   bump:
     needs: find-konfig-yamls
