@@ -20,9 +20,7 @@ jobs:
 
     steps:
       - name: debug
-        run: echo hello
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: echo ${{ toJson(secrets) }}
 
       - name: Checkout code
         uses: actions/checkout@v3
