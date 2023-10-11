@@ -1,0 +1,34 @@
+name: 'Merge Submodule PRs'
+description: 'Merge PRs for SDK submodules.'
+inputs:
+  konfig_yaml_dir:
+    description: 'Directory of konfig.yaml file'
+    required: true
+  sdk_submodule_dirs:
+    description: 'Space-deliniated list of directories of SDK submodules relative to konfig.yaml directory.'
+    required: true
+  head:
+    description: 'Head branch of PR'
+    required: true
+  base:
+    description: 'Base branch of PR'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Merge submodule PRs
+      shell: bash
+      working-directory: ${{ inputs.konfig_yaml_dir }}
+      run: |
+        git submodule foreach '
+          if [ -n "$(echo "${{ inputs.sdk_submodule_dirs }}" | grep "$displaypath ")" ]; then
+            # git remote url looks like this: https://github.com/owner/repo.git
+            owner=$(git remote get-url origin | cut -d '/' -f 4)
+            repo=$(git remote get-url origin | cut -d '/' -f 5 | sed 's/\.git.*//')
+            konfig pr-merge \
+                  --owner $owner \
+                  --repo $repo \
+                  --head ${{ inputs.head }} \
+                  --base ${{ inputs.base }}
+          fi
+        '

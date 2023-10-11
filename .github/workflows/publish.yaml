@@ -59,23 +59,14 @@ jobs:
         if: >
           steps.detect-changesets.outputs.has_changesets == 'false' &&
           steps.sdk-submodules.outputs.dirs != ''
-        working-directory: ${{ inputs.konfig_yaml_dir }}
         env:
           KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
-        run: |
-          git submodule foreach '
-            if [ -n "$(echo "${{ steps.sdk-submodules.outputs.dirs }}" | grep "$displaypath ")" ]; then
-              echo Merging PR in SDK submodule at path: $name
-              # git remote url looks like this: https://github.com/owner/repo.git
-              owner=$(git remote get-url origin | cut -d '/' -f 4)
-              repo=$(git remote get-url origin | cut -d '/' -f 5 | sed 's/\.git.*//')
-              konfig pr-merge \
-                    --owner $owner \
-                    --repo $repo \
-                    --head ${{ steps.branch-name.outputs.branch_name }} \
-                    --base ${{ github.ref_name }}
-            fi
-          '
+        uses: konfig-dev/automation/.github/actions/private/merge-submodule-prs@main
+        with:
+          konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
+          sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
+          head: ${{ steps.branch-name.outputs.branch_name }}
+          base: ${{ github.ref_name }}
 
       - name: Update submodule references
         if: >
@@ -110,14 +101,10 @@ jobs:
       - name: Install konfig
         run: npm install -g konfig-cli
 
-      - name: Mask secrets
-        run: |
-          echo "${{ secrets.TEST_ENV }}" | while read -r line; do
-            echo "::add-mask::${line#*=}"
-          done
-
-      - name: Set env vars for test
-        run: echo "${{ secrets.TEST_ENV }}" >> $GITHUB_ENV
+      - name: Setup test env vars
+        uses: konfig-dev/automation/.github/actions/private/inject-testing-env-vars@main
+        with:
+          TEST_ENV: ${{ secrets.TEST_ENV }}
 
       - name: Run tests
         run: konfig test
