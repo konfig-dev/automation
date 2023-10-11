@@ -62,7 +62,7 @@ runs:
               --base ${{ inputs.base }} \
               --owner $owner \
               --repo $repo \
-              --title ${{ inputs.pr_title }} \
-              --body ${{ inputs.pr_body }}
+              --title "${{ inputs.pr_title }}" \
+              --body "${{ inputs.pr_body }}"
           fi
         '
