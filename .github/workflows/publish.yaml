@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       has_changesets: ${{ steps.detect-changesets.outputs.has_changesets }}
+      sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -119,6 +120,7 @@ jobs:
 
       # If any SDKs are in submodules, then publishing might require pushing tags to the submodule repos
       - name: Set up SSH key for submodule access
+        if: needs.pre-publish.outputs.sdk_submodule_dirs != ''
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: |
