@@ -61,7 +61,7 @@ jobs:
           steps.sdk-submodules.outputs.dirs != ''
         env:
           KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
-        uses: konfig-dev/automation/.github/actions/private/merge-submodule-prs@ENG-1187-test-3
+        uses: konfig-dev/automation/.github/actions/private/merge-submodule-prs@main
         with:
           konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
           sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
@@ -102,7 +102,7 @@ jobs:
         run: npm install -g konfig-cli
 
       - name: Setup test env vars
-        uses: konfig-dev/automation/.github/actions/private/inject-testing-env-vars@ENG-1187-test-3
+        uses: konfig-dev/automation/.github/actions/private/inject-testing-env-vars@main
         with:
           TEST_ENV: ${{ secrets.TEST_ENV }}
 

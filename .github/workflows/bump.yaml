@@ -77,7 +77,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
-        uses: konfig-dev/automation/.github/actions/private/push-submodules-to-pr@ENG-1187-test-3
+        uses: konfig-dev/automation/.github/actions/private/push-submodules-to-pr@main
         with:
           konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
           sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
