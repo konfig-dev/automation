@@ -2,7 +2,7 @@
 FROM node:18
 
 ### PYTHON
-RUN apt-get update && apt-get install -y python3
+RUN apt-get update && apt-get install -y lsof python3
 RUN apt install -y python3-poetry
 # Needed for publishing to pypi
 RUN apt install python3.11-venv
