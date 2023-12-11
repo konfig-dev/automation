@@ -109,8 +109,12 @@ jobs:
         TEST_ENV: ${{ secrets.TEST_ENV }}
 
     - name: Run tests
-      run: konfig test
-      working-directory: ${{ inputs.konfig_yaml_dir }}
+      uses: nick-fields/retry@v2
+      with:
+        timeout_minutes: 15
+        max_attempts: 3
+        retry_on: error
+        command: cd ${{ inputs.konfig_yaml_dir }} && konfig test
       env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
