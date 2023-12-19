@@ -15,6 +15,7 @@ on:
 jobs:
   find-konfig-yamls:
     runs-on: ubuntu-latest
+    concurrency: ${{ github.workflow }}-${{ github.ref }}
     outputs:
       konfig_yaml_dirs: ${{ steps.find-konfig-yamls.outputs.konfig_yaml_dirs }}
 
