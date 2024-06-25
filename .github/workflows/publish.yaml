@@ -130,6 +130,7 @@ jobs:
           ssh-private-key: |
             ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
 
       - name: Publish SDKs
         run: konfig publish --all --skipTests --tolerateRepublish --skipRemoteCheck
