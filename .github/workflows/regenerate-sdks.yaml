@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: regenerate-sdks
     container:
-      image: konfigdev/test-and-publish:latest
+      image: konfigdev/test-and-publish:staging
 
     steps:
     - name: Checkout code

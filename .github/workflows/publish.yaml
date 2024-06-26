@@ -85,12 +85,15 @@ jobs:
     needs: pre-publish
     if: needs.pre-publish.outputs.has_changesets == 'false'
     container: # runs in docker container
-      image: konfigdev/test-and-publish:latest
+      image: konfigdev/test-and-publish:staging
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       PYPI_TOKEN_1: ${{ secrets.PYPI_TOKEN_1 }}
       PYPI_TOKEN_2: ${{ secrets.PYPI_TOKEN_2 }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
 
     steps:
       - name: Checkout code
@@ -131,6 +134,25 @@ jobs:
             ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
+
+      - name: Setup GPG for signing
+        run: |
+          echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --batch --passphrase "$GPG_PASSPHRASE" --import
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye
+          echo RELOADAGENT | gpg-connect-agent
+          eval $(gpg-agent --daemon)
+          export GPG_TTY=$(tty)
+          echo "$GPG_PASSPHRASE" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --export-secret-keys $GPG_KEY_ID > /dev/null
+
+      - name: Write settings.xml file for Java publishing
+        uses: konfig-dev/automation/.github/actions/private/write-settings-xml@ENG-1483
+        with:
+          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          ossrh_username: ${{ secrets.OSSRH_USERNAME }}
+          ossrh_password: ${{ secrets.OSSRH_PASSWORD }}
 
       - name: Publish SDKs
         run: konfig publish --all --skipTests --tolerateRepublish --skipRemoteCheck
