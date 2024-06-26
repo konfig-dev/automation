@@ -142,9 +142,6 @@ jobs:
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
           echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
           gpg-connect-agent reloadagent /bye
-          echo RELOADAGENT | gpg-connect-agent
-          eval $(gpg-agent --daemon)
-          export GPG_TTY=$(tty)
           echo "$GPG_PASSPHRASE" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --export-secret-keys $GPG_KEY_ID > /dev/null
 
       - name: Write settings.xml file for Java publishing
