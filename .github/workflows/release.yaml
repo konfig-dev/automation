@@ -19,6 +19,16 @@ on:
         required: false
       PYPI_TOKEN_2:
         required: false
+      GPG_PASSPHRASE:
+        required: false
+      GPG_PRIVATE_KEY:
+        required: false
+      GPG_KEY_ID:
+        required: false
+      OSSRH_USERNAME:
+        required: false
+      OSSRH_PASSWORD:
+        required: false
 
 jobs:
   find-konfig-yamls:
