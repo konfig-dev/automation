@@ -141,8 +141,8 @@ jobs:
           echo "use-agent" >> ~/.gnupg/gpg.conf
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
           echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent
           gpg-connect-agent reloadagent /bye
-          echo "$GPG_PASSPHRASE" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --export-secret-keys $GPG_KEY_ID > /dev/null
 
       - name: Write settings.xml file for Java publishing
         uses: konfig-dev/automation/.github/actions/private/write-settings-xml@ENG-1483
@@ -152,6 +152,6 @@ jobs:
           ossrh_password: ${{ secrets.OSSRH_PASSWORD }}
 
       - name: Publish SDKs
-        run: konfig publish --all --skipTests --tolerateRepublish --skipRemoteCheck
+        run: konfig publish --all --skipTests --tolerateRepublish --skipRemoteCheck --ci
         working-directory: ${{ inputs.konfig_yaml_dir }}
         shell: bash
