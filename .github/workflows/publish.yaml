@@ -151,6 +151,9 @@ jobs:
           ossrh_username: ${{ secrets.OSSRH_USERNAME }}
           ossrh_password: ${{ secrets.OSSRH_PASSWORD }}
 
+      - name: Verify settings.xml
+        run: cat ~/.m2/settings.xml
+
       - name: Publish SDKs
         run: konfig publish --all --skipTests --tolerateRepublish --skipRemoteCheck --ci
         working-directory: ${{ inputs.konfig_yaml_dir }}
