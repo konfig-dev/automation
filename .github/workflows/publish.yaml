@@ -151,10 +151,12 @@ jobs:
           ossrh_username: ${{ secrets.OSSRH_USERNAME }}
           ossrh_password: ${{ secrets.OSSRH_PASSWORD }}
 
-      - name: Verify settings.xml
-        run: cat ~/.m2/settings.xml
+      # - name: Publish SDKs
+      #   run: konfig publish --all --skipTests --tolerateRepublish --skipRemoteCheck --ci
+      #   working-directory: ${{ inputs.konfig_yaml_dir }}
+      #   shell: bash
 
-      - name: Publish SDKs
-        run: konfig publish --all --skipTests --tolerateRepublish --skipRemoteCheck --ci
-        working-directory: ${{ inputs.konfig_yaml_dir }}
+      - name: Publish Java Test
+        run: mvn clean deploy -Dmaven.test.skip=true -Dgpg.executable=gpg -Dgpg.passphrase="$GPG_PASSPHRASE" -Dgpg.keyname="$GPG_KEY_ID" -P ossrh --settings ~/.m2/settings.xml
+        working-directory: ${{ inputs.konfig_yaml_dir }}/java
         shell: bash
