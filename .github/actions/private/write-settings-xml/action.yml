@@ -1,0 +1,42 @@
+name: 'Write settings.xml'
+description: 'Writes ~/.m2/settings.xml file for Java publishing'
+inputs:
+  gpg_passphrase: 
+    description: 'GPG passphrase'
+    required: true
+  ossrh_username: 
+    description: 'Username for ossrh repository'
+    required: true
+  ossrh_password:
+    description: 'Password for ossrh repository'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Write settings.xml
+      run: |
+        mkdir -p ~/.m2
+        cat <<EOF > ~/.m2/settings.xml
+        <settings>
+          <profiles>
+            <profile>
+              <id>ossrh</id>
+              <activation>
+                <activeByDefault>true</activeByDefault>
+              </activation>
+              <properties>
+                <gpg.executable>gpg</gpg.executable>
+                <gpg.passphrase>${{ inputs.gpg_passphrase }}</gpg.passphrase>
+              </properties>
+            </profile>
+          </profiles>
+          <servers>
+            <server>
+              <id>ossrh</id>
+              <username>${{ inputs.ossrh_username }}</username>
+              <password>${{ inputs.ossrh_password }}</password>
+            </server>
+          </servers>
+        </settings>
+        EOF
+      shell: bash
