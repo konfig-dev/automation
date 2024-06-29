@@ -146,7 +146,6 @@ jobs:
           gpg-connect-agent reloadagent /bye
 
       - name: Write settings.xml file for Java publishing
-        if: env.GPG_PRIVATE_KEY && env.GPG_PASSPHRASE && env.GPG_KEY_ID && env.OSSRH_USERNAME && env.OSSRH_PASSWORD
         uses: konfig-dev/automation/.github/actions/private/write-settings-xml@main
         with:
           gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
