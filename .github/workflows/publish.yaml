@@ -85,7 +85,7 @@ jobs:
     needs: pre-publish
     if: needs.pre-publish.outputs.has_changesets == 'false'
     container: # runs in docker container
-      image: konfigdev/test-and-publish:staging
+      image: konfigdev/test-and-publish:latest
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       PYPI_TOKEN_1: ${{ secrets.PYPI_TOKEN_1 }}
