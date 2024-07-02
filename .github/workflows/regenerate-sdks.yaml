@@ -80,6 +80,7 @@ jobs:
           ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
           ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
           ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
+          ${{ secrets.SUBMODULE_DEPLOY_KEY_CSHARP }}
         head: ${{ github.head_ref }}
         base: ${{ github.base_ref }}
         commit_msg: "Regenerate SDKs"

@@ -94,6 +94,7 @@ jobs:
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
     steps:
       - name: Checkout code
@@ -134,6 +135,7 @@ jobs:
             ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_CSHARP }}
 
       - name: Setup GPG for signing
         if: env.GPG_PRIVATE_KEY && env.GPG_PASSPHRASE && env.GPG_KEY_ID

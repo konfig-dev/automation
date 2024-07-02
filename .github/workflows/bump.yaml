@@ -85,6 +85,7 @@ jobs:
             ${{ secrets.SUBMODULE_DEPLOY_KEY_PYTHON }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_CSHARP }}
           head: ${{ steps.branch-name.outputs.branch_name }}
           base: ${{ github.ref_name }}
           commit_msg: "Version Bump SDKs"

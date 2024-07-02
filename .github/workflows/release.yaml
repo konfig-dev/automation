@@ -13,6 +13,8 @@ on:
         required: false
       SUBMODULE_DEPLOY_KEY_JAVA:
         required: false
+      SUBMODULE_DEPLOY_KEY_CSHARP:
+        required: false
       NPM_TOKEN:
         required: false
       PYPI_TOKEN_1:
@@ -28,6 +30,8 @@ on:
       OSSRH_USERNAME:
         required: false
       OSSRH_PASSWORD:
+        required: false
+      NUGET_API_KEY:
         required: false
 
 jobs:
