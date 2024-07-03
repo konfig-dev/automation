@@ -13,6 +13,8 @@ on:
         required: false
       SUBMODULE_DEPLOY_KEY_JAVA:
         required: false
+      SUBMODULE_DEPLOY_KEY_CSHARP:
+        required: false
 
 jobs:
   find-konfig-yamls:
