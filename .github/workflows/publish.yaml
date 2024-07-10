@@ -136,6 +136,7 @@ jobs:
             ${{ secrets.SUBMODULE_DEPLOY_KEY_TYPESCRIPT }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_JAVA }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_CSHARP }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_GO }}
 
       - name: Setup GPG for signing
         if: env.GPG_PRIVATE_KEY && env.GPG_PASSPHRASE && env.GPG_KEY_ID

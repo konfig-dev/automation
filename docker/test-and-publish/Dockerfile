@@ -4,7 +4,7 @@ FROM node:18-bullseye
 RUN npm install -g pnpm 
 
 # python and java
-RUN apt-get update && apt-get install -y lsof python3 python3-pip python3-venv maven openjdk-11-jdk
+RUN apt-get update && apt-get install -y lsof python3 python3-pip python3-venv maven openjdk-11-jdk golang
 RUN pip3 install poetry
 # clean up python installations
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
