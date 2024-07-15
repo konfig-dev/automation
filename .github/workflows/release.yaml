@@ -17,6 +17,8 @@ on:
         required: false
       SUBMODULE_DEPLOY_KEY_GO:
         required: false
+      SUBMODULE_DEPLOY_KEY_PHP:
+        required: false
       NPM_TOKEN:
         required: false
       PYPI_TOKEN_1:
