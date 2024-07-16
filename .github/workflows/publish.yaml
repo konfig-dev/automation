@@ -95,6 +95,7 @@ jobs:
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      PACKAGIST_API_TOKEN: ${{ secrets.PACKAGIST_API_TOKEN }}
 
     steps:
       - name: Checkout code
