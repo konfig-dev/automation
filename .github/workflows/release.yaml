@@ -37,6 +37,8 @@ on:
         required: false
       NUGET_API_KEY:
         required: false
+      PACKAGIST_API_TOKEN:
+        required: false
 
 jobs:
   find-konfig-yamls:
