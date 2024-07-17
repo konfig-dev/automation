@@ -19,6 +19,8 @@ on:
         required: false
       SUBMODULE_DEPLOY_KEY_PHP:
         required: false
+      SUBMODULE_DEPLOY_KEY_RUBY:
+        required: false
       NPM_TOKEN:
         required: false
       PYPI_TOKEN_1:
@@ -38,6 +40,8 @@ on:
       NUGET_API_KEY:
         required: false
       PACKAGIST_API_TOKEN:
+        required: false
+      GEM_HOST_API_KEY:
         required: false
 
 jobs:
