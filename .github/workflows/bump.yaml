@@ -119,6 +119,7 @@ jobs:
                 --body "Version Bumps SDKs" # TODO: this should be replaced by a changelog
 
       - name: Check if automatic merging for bump PR is disabled
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
         id: check-merge-disabled
         uses: mikefarah/yq@v4.35.2
         with:
