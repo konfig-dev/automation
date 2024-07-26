@@ -117,3 +117,25 @@ jobs:
                 --repo $repo \
                 --title "Version Bump SDKs" \
                 --body "Version Bumps SDKs" # TODO: this should be replaced by a changelog
+
+      - name: Check if automatic merging for bump PR is disabled
+        if: steps.detect-changesets.outputs.has_changesets == 'true'
+        id: check-merge-disabled
+        uses: mikefarah/yq@v4.35.2
+        with:
+          cmd: yq '.doNotAutoMergeBumpPr' ${{ inputs.konfig_yaml_dir }}/konfig.yaml
+
+      # Submodule PRs are merged automatically in the subsequent triggered workflow
+      - name: Merge Top-Level Version Bump PR
+        if: >
+          steps.detect-changesets.outputs.has_changesets == 'true' &&
+          steps.check-merge-disabled.outputs.result != 'true'
+        env:
+          KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
+        run: |
+          repo=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          konfig pr-merge \
+            --head ${{ steps.branch-name.outputs.branch_name }} \
+            --base ${{ github.ref_name }} \
+            --owner ${{ github.repository_owner }} \
+            --repo $repo
