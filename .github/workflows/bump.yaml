@@ -128,7 +128,7 @@ jobs:
       - name: Merge Top-Level Version Bump PR
         if: >
           steps.detect-changesets.outputs.has_changesets == 'true' &&
-          steps.check-merge-disabled.outputs.result != "true"
+          steps.check-merge-disabled.outputs.result != 'true'
         env:
           KONFIG_API_KEY: ${{ secrets.KONFIG_API_KEY }}
         run: |
