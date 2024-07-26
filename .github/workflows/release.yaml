@@ -21,6 +21,8 @@ on:
         required: false
       SUBMODULE_DEPLOY_KEY_RUBY:
         required: false
+      SUBMODULE_DEPLOY_KEY_SWIFT:
+        required: false
       NPM_TOKEN:
         required: false
       PYPI_TOKEN_1:
@@ -42,6 +44,10 @@ on:
       PACKAGIST_API_TOKEN:
         required: false
       GEM_HOST_API_KEY:
+        required: false
+      COCOAPODS_SESSION_PASSWORD:
+        required: false
+      COCOAPODS_SESSION_EMAIL:
         required: false
 
 jobs:

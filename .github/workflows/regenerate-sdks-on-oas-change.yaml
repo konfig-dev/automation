@@ -21,6 +21,8 @@ on:
         required: false
       SUBMODULE_DEPLOY_KEY_RUBY:
         required: false
+      SUBMODULE_DEPLOY_KEY_SWIFT:
+        required: false
 
 jobs:
   find-konfig-yamls:

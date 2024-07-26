@@ -12,10 +12,15 @@ RUN apt-get update && apt-get install -y \
 RUN gem install bundler
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN pip3 install poetry
-
 # clean up python installations
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# swift
+RUN curl -s https://packagecloud.io/install/repositories/swift-arm/release/script.deb.sh | bash
+RUN apt install -y swiftlang
+RUN gem install cocoapods
+
+# csharp
 RUN curl -Lo dotnet-install.sh https://dot.net/v1/dotnet-install.sh && \
     chmod +x ./dotnet-install.sh && \
     ./dotnet-install.sh --channel 7.0 && \

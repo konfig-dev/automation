@@ -141,6 +141,7 @@ jobs:
             ${{ secrets.SUBMODULE_DEPLOY_KEY_GO }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_PHP }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_RUBY }}
+            ${{ secrets.SUBMODULE_DEPLOY_KEY_SWIFT }}
 
       - name: Setup GPG for signing
         if: env.GPG_PRIVATE_KEY && env.GPG_PASSPHRASE && env.GPG_KEY_ID
@@ -158,6 +159,11 @@ jobs:
           gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
           ossrh_username: ${{ secrets.OSSRH_USERNAME }}
           ossrh_password: ${{ secrets.OSSRH_PASSWORD }}
+
+      - name: Write .netrc file for Swift publishing
+        run: |
+          printf "machine trunk.cocoapods.org\n login ${{ secrets.COCOAPODS_SESSION_EMAIL }}\n password ${{ secrets.COCOAPODS_SESSION_PASSWORD }}" > ~/.netrc
+          chmod 600 ~/.netrc
       
       - name: Publish SDKs
         uses: nick-fields/retry@v2
