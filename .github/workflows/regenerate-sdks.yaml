@@ -41,8 +41,15 @@ jobs:
       run: konfig fix --ci
       working-directory: ${{ inputs.konfig_yaml_dir }}
 
+    - name: Check if linting is disabled
+      id: check-linter-disabled
+      uses: mikefarah/yq@v4.35.2
+      with:
+        cmd: yq '.disableAutomationLinter' ${{ inputs.konfig_yaml_dir }}/konfig.yaml
+
     - name: Lint OAS
       # This exits with code 1 if linting fails, thus terminating the workflow if the OAS does not pass linting
+      if: steps.check-linter-disabled.outputs.result != 'true'
       run: konfig lint
       working-directory: ${{ inputs.konfig_yaml_dir }}
 
