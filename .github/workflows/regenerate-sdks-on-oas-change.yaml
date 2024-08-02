@@ -19,6 +19,8 @@ on:
         required: false
       SUBMODULE_DEPLOY_KEY_PHP:
         required: false
+      SUBMODULE_DEPLOY_KEY_PHP7:
+        required: false
       SUBMODULE_DEPLOY_KEY_RUBY:
         required: false
       SUBMODULE_DEPLOY_KEY_SWIFT:

@@ -90,6 +90,7 @@ jobs:
           ${{ secrets.SUBMODULE_DEPLOY_KEY_CSHARP }}
           ${{ secrets.SUBMODULE_DEPLOY_KEY_GO }}
           ${{ secrets.SUBMODULE_DEPLOY_KEY_PHP }}
+          ${{ secrets.SUBMODULE_DEPLOY_KEY_PHP7 }}
           ${{ secrets.SUBMODULE_DEPLOY_KEY_RUBY }}
           ${{ secrets.SUBMODULE_DEPLOY_KEY_SWIFT }}
         head: ${{ github.head_ref }}
