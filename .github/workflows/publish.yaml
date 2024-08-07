@@ -77,7 +77,6 @@ jobs:
         with:
           konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
           sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
-          submodules_base_branch: ${{ github.ref_name }}
           push_to: ${{ github.ref_name }}
 
   publish:
@@ -165,7 +164,7 @@ jobs:
         run: |
           printf "machine trunk.cocoapods.org\n login ${{ secrets.COCOAPODS_SESSION_EMAIL }}\n password ${{ secrets.COCOAPODS_SESSION_PASSWORD }}" > ~/.netrc
           chmod 600 ~/.netrc
-      
+
       - name: Publish SDKs
         uses: nick-fields/retry@v2
         with:

@@ -49,7 +49,6 @@ jobs:
         with:
           konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
           sdk_submodule_dirs: ${{ steps.sdk-submodules.outputs.dirs }}
-          submodules_base_branch: ${{ github.ref_name }}
 
       - name: Get version bump branch name
         id: branch-name

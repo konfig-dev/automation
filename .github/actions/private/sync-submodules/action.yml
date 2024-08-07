@@ -7,9 +7,6 @@ inputs:
   sdk_submodule_dirs:
     description: 'Space-deliniated list of SDK submodule directories relative to konfig_yaml_dir'
     required: true
-  submodules_base_branch:
-    description: 'Name of branch to sync for submodule SDKs (e.g. main, master)'
-    required: true
   push_to:
     description: 'Name of branch to push sync to in top-level repo. If empty, submodule sync is committed but not pushed'
     required: false
@@ -23,7 +20,7 @@ runs:
       run: |
         git submodule foreach '
           if [ -n "$(echo "${{ inputs.sdk_submodule_dirs }}" | grep "$displaypath ")" ]; then
-            git fetch origin ${{ inputs.submodules_base_branch }}
+            git fetch
             git checkout FETCH_HEAD
           fi
         '

@@ -175,7 +175,6 @@ jobs:
       with:
         konfig_yaml_dir: ${{ inputs.konfig_yaml_dir }}
         sdk_submodule_dirs: ${{ needs.regenerate-sdks.outputs.sdk_submodule_dirs }}
-        submodules_base_branch: ${{ github.base_ref }}
         push_to: ${{ github.head_ref }}
 
     - name: Merge top-level PR
