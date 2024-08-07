@@ -13,9 +13,6 @@ inputs:
   head:
     description: 'Branch to push to and open PR from'
     required: true
-  base:
-    description: 'Branch to open PR against'
-    required: true
   commit_msg:
     description: 'Commit message'
     required: true
@@ -59,7 +56,6 @@ runs:
 
             konfig pr-create \
               --head ${{ inputs.head }} \
-              --base ${{ inputs.base }} \
               --owner $owner \
               --repo $repo \
               --title "${{ inputs.pr_title }}" \

@@ -91,7 +91,6 @@ jobs:
             ${{ secrets.SUBMODULE_DEPLOY_KEY_RUBY }}
             ${{ secrets.SUBMODULE_DEPLOY_KEY_SWIFT }}
           head: ${{ steps.branch-name.outputs.branch_name }}
-          base: ${{ github.ref_name }}
           commit_msg: "Version Bump SDKs"
           pr_title: "Version Bump SDKs"
           pr_body: "Do not manually merge this PR. It will be merged automatically once the top-level PR is merged."

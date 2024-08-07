@@ -94,7 +94,6 @@ jobs:
           ${{ secrets.SUBMODULE_DEPLOY_KEY_RUBY }}
           ${{ secrets.SUBMODULE_DEPLOY_KEY_SWIFT }}
         head: ${{ github.head_ref }}
-        base: ${{ github.base_ref }}
         commit_msg: "Regenerate SDKs"
         pr_title: "Regenerate SDKs"
         pr_body: "Automatically created by top-level SDK repo PR: ${{ github.event.pull_request.html_url }}"
