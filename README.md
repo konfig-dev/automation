@@ -6,7 +6,7 @@
 
 Konfig's automation runs as a series of GitHub actions. The GitHub actions are triggered by events (such as opening a PR or pushing a commit) in a customer's repository. Thus, each customer repository requires 2 GitHub actions worklow files, `regenerate-sdks-on-oas-change` and `release`, to be triggered by the relevant events in their repository.
 
-These workflow files simply perform a "workflow call" to reusable workflows which live in Konfig's automation repository. Konfig uses reusable workflows for DRYness and maintainability. For more information about reusable workflows in GitHub actions, see the documentation [here](https://docs.github.com/en/actions/sharing-automations/reusing-workflows)
+These workflow files simply perform a "workflow call" to reusable workflows which live in Konfig's automation repository. Konfig uses reusable workflows for DRYness and maintainability. For more information about reusable workflows in GitHub actions, see the documentation [here](https://docs.github.com/en/actions/sharing-automations/reusing-workflows).
 
 ### Changesets
 
